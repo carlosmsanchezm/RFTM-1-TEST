@@ -32,7 +32,22 @@
   become: true
   vars:
     ansible_python_interpreter: /usr/bin/python3  # Set the correct Python path
+    app_path: /usr/src/app
+    app_git_repo: https://github.com/carlosmsanchezm/RFTM-1-TEST.git # Replace with your Git repository URL
+    app_git_version: main  # Replace with your desired branch, tag, or commit
+
   tasks:
+    - name: Install Git
+      ansible.builtin.yum:
+        name: git
+        state: present
+
+    - name: Clone the Node.js application repository
+      ansible.builtin.git:
+        repo: "{{ app_git_repo }}"
+        dest: "{{ app_path }}"
+        version: "{{ app_git_version }}"
+
     - name: Install Docker
       ansible.builtin.yum:
         name: docker
