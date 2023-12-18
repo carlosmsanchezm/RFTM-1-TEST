@@ -10,17 +10,22 @@
     git_version: main                             # Branch to pull from
 
   tasks:
-    - name: Install Git
-      ansible.builtin.yum:
-        name: git
-        state: present
-
-    - name: Pull latest code from Git
+    - name: Fetch all branches from Git
       ansible.builtin.git:
         repo: "{{ git_repo }}"
         dest: "{{ app_path }}"
         version: "{{ git_version }}"
         force: yes
+
+    - name: Reset working directory to latest commit
+      ansible.builtin.command:
+        cmd: git reset --hard origin/{{ git_version }}
+        chdir: "{{ app_path }}"
+
+    - name: Check git operation result
+      ansible.builtin.debug:
+        msg: "{{ git_operation.stdout_lines }}"
+      when: git_operation.changed
 
     - name: Build Docker image (with no cache)
       community.docker.docker_image:
