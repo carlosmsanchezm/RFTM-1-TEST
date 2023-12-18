@@ -2,12 +2,12 @@
   hosts: nodejs_group
   become: true
   vars:
-    ansible_python_interpreter: /usr/bin/python3  # Assuming Python path is consistent
-    app_path: /usr/src/app                        # Application path from existing tasks
-    image_name: my-nodejs-app                     # Image name from existing tasks
-    image_tag: latest                             # Tag for the Docker image
-    git_repo: https://github.com/carlosmsanchezm/RFTM-1-TEST.git             # Git repository URL
-    git_version: main                             # Branch to pull from
+    ansible_python_interpreter: /usr/bin/python3
+    app_path: /usr/src/app
+    image_name: my-nodejs-app
+    image_tag: latest
+    git_repo: https://github.com/carlosmsanchezm/RFTM-1-TEST.git
+    git_version: main
 
   tasks:
     - name: Fetch all branches from Git
@@ -22,11 +22,6 @@
         cmd: git reset --hard origin/{{ git_version }}
         chdir: "{{ app_path }}"
 
-    - name: Check git operation result
-      ansible.builtin.debug:
-        msg: "{{ git_operation.stdout_lines }}"
-      when: git_operation.changed
-
     - name: Build Docker image (with no cache)
       community.docker.docker_image:
         build:
@@ -36,7 +31,12 @@
         tag: "{{ image_tag }}"
         source: build
 
-    - name: Start Docker container
+    - name: Remove existing Docker container
+      community.docker.docker_container:
+        name: "{{ image_name }}"
+        state: absent
+
+    - name: Start Docker container with new image
       community.docker.docker_container:
         name: "{{ image_name }}"
         image: "{{ image_name }}:{{ image_tag }}"
@@ -45,3 +45,4 @@
           - "80:3000"
         recreate: true
         restart_policy: always
+
