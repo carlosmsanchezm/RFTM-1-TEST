@@ -6,7 +6,7 @@
     app_path: /usr/src/app                        # Application path from existing tasks
     image_name: my-nodejs-app                     # Image name from existing tasks
     image_tag: latest                             # Tag for the Docker image
-    git_repo: your_git_repository_url             # Git repository URL
+    git_repo: https://github.com/carlosmsanchezm/RFTM-1-TEST.git             # Git repository URL
     git_version: main                             # Branch to pull from
 
   tasks:
